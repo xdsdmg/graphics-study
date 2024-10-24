@@ -1,0 +1,3 @@
+/home/zhangchi/workarea/code/graphics-study/pa1/code/build/CMakeFiles/Rasterizer.dir
+/home/zhangchi/workarea/code/graphics-study/pa1/code/build/CMakeFiles/edit_cache.dir
+/home/zhangchi/workarea/code/graphics-study/pa1/code/build/CMakeFiles/rebuild_cache.dir
