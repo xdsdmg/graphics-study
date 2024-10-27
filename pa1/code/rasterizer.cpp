@@ -30,11 +30,11 @@ rst::rasterizer::load_indices(const std::vector<Eigen::Vector3i> &indices)
 // Code taken from a stack overflow answer: https://stackoverflow.com/a/16405254
 void rst::rasterizer::draw_line(Eigen::Vector3f begin, Eigen::Vector3f end)
 {
-  std::cout << "begin:\n"
-            << begin << std::endl;
-  std::cout << "end:\n"
-            << end << std::endl;
-  std::cout << std::endl;
+  // std::cout << "begin:\n"
+  //           << begin << std::endl;
+  // std::cout << "end:\n"
+  //           << end << std::endl;
+  // std::cout << std::endl;
 
   auto x1 = begin.x();
   auto y1 = begin.y();
@@ -243,5 +243,11 @@ void rst::rasterizer::set_pixel(const Eigen::Vector3f &point,
       point.y() >= height)
     return;
   auto ind = (height - point.y()) * width + point.x();
+
+  if (ind >= frame_buf.size())
+  {
+    std::cout << "ind: " << ind << " size: " << frame_buf.size() << std::endl;
+  }
+
   frame_buf[ind] = color;
 }

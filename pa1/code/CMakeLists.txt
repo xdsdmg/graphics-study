@@ -9,3 +9,5 @@ include_directories(/usr/local/include)
 
 add_executable(Rasterizer main.cpp rasterizer.hpp rasterizer.cpp Triangle.hpp Triangle.cpp)
 target_link_libraries(Rasterizer ${OpenCV_LIBRARIES})
+
+set_target_properties(Rasterizer PROPERTIES COMPILE_FLAGS "-g")

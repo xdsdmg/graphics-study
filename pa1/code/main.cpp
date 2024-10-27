@@ -28,10 +28,12 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
   // Create the model matrix for rotating the triangle around the Z axis.
   // Then return it.
 
-  model(0, 0) = std::cos(rotation_angle);
-  model(0, 1) = -std::sin(rotation_angle);
-  model(1, 0) = std::sin(rotation_angle);
-  model(1, 1) = std::cos(rotation_angle);
+  float alpha = rotation_angle * MY_PI / 180.0f;
+
+  model(0, 0) = std::cos(alpha);
+  model(0, 1) = -std::sin(alpha);
+  model(1, 0) = std::sin(alpha);
+  model(1, 1) = std::cos(alpha);
 
   return model;
 }
@@ -47,29 +49,45 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
   // Create the projection matrix for the given parameters.
   // Then return it.
 
-  Eigen::Matrix4f persp = Eigen::Matrix4f::Identity();
+  float n = zNear, f = zFar;
 
-  persp(0, 0) = zNear;
-  persp(1, 1) = zNear;
-  persp(2, 2) = zNear + zFar;
-  persp(2, 3) = -zNear * zFar;
+  /*
+    persp to ortho
+   */
+  Eigen::Matrix4f persp_to_ortho = Eigen::Matrix4f::Identity();
 
-  Eigen::Matrix4f ortho = Eigen::Matrix4f::Identity();
-  float t = zNear * std::tan(eye_fov / 2);
+  persp_to_ortho(0, 0) = n;
+  persp_to_ortho(1, 1) = n;
+  persp_to_ortho(2, 2) = n + f;
+  persp_to_ortho(2, 3) = -n * f;
+  persp_to_ortho(3, 2) = 1;
+  persp_to_ortho(3, 3) = 0;
+
+  /*
+    ortho
+  */
+  float alpha = (eye_fov / 2) * MY_PI / 180.0f;
+  float t = -n * std::tan(alpha); // n is a negative number
   float b = -t;
   float r = t * aspect_ratio;
   float l = -r;
 
-  ortho(0, 0) = 2 / (r - l);
-  ortho(1, 1) = 2 / (t - b);
-  ortho(2, 2) = 2 / (zNear - zFar);
+  Eigen::Matrix4f scale = Eigen::Matrix4f::Identity();
+  scale(0, 0) = 2 / (r - l);
+  scale(1, 1) = 2 / (t - b);
+  scale(2, 2) = 2 / (n - f);
 
   Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
   trans(0, 3) = -(r + l) / 2;
   trans(1, 3) = -(t + b) / 2;
-  trans(2, 3) = -(zNear + zFar) / 2;
+  trans(2, 3) = -(n + f) / 2;
 
-  Eigen::Matrix4f projection = ortho * trans * persp;
+  Eigen::Matrix4f ortho = scale * trans;
+
+  /*
+    projection
+  */
+  Eigen::Matrix4f projection = ortho * persp_to_ortho;
 
   return projection;
 }
@@ -114,6 +132,7 @@ int main(int argc, const char **argv)
     r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
     r.draw(pos_id, ind_id, rst::Primitive::Triangle);
+
     cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
     image.convertTo(image, CV_8UC3, 1.0f);
 
