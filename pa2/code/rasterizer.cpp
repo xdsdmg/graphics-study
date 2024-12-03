@@ -144,8 +144,8 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t) {
       right = int(floor(right_)), left = int(floor(left_));
 
   int w = right - left, h = top - bottom;
-  for (int i = 0; i < w; i++) {
-    for (int j = 0; j < h; j++) {
+  for (int i = 0; i <= w; i++) {
+    for (int j = 0; j <= h; j++) {
       int x = i + left, y = j + bottom;
 
       if (!insideTriangle(x, y, t.v))

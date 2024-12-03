@@ -297,9 +297,9 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t, const std::array<Eig
 
     int w = right - left, h = top - bottom;
 
-    for (int i = 0; i < w; i++)
+    for (int i = 0; i <= w; i++)
     {
-        for (int j = 0; j < h; j++)
+        for (int j = 0; j <= h; j++)
         {
             int x = i + left, y = j + bottom;
 
@@ -319,7 +319,16 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t, const std::array<Eig
             {
                 depth_buf[ind] = z_interpolated;
 
-                set_pixel(Vector3f(x, y, 0), t.getColor());
+                Vector3f interpolated_color = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1);
+                Vector3f interpolated_normal = interpolate(alpha, beta, gamma, t.normal[0], t.normal[1], t.normal[2], 1);
+                Vector2f interpolated_texcoords = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1);
+                Vector3f interpolated_shadingcoords = interpolate(alpha, beta, gamma, view_pos[0], view_pos[1], view_pos[2], 1);
+
+                fragment_shader_payload payload(interpolated_color, interpolated_normal.normalized(), interpolated_texcoords, texture ? &*texture : nullptr);
+                payload.view_pos = interpolated_shadingcoords;
+                auto pixel_color = fragment_shader(payload);
+
+                set_pixel(Vector2i(x, y), pixel_color);
             }
         }
     }
